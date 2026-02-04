@@ -1,0 +1,21 @@
+name: Periodic Health Check
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  
+  push:
+    branches:
+      - main
+
+jobs:
+  health_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the deployed service URL
+        uses: jtalk/url-health-check-action@v4
+        with:
+          url: https://full-stack-open-pokedex-83d3.onrender.com/
+          follow-redirect: false 
+          max-attempts: 3 
+          retry-delay: 5s

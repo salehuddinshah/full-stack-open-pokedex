@@ -40,15 +40,24 @@ jobs:
           deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
           curl "$deploy_url"
-      - name: notification
+      - name: Discord Notification - Success
         uses: rjstone/discord-webhook-notify@v2
-        if: ${{ success() && github.event_name == 'push'}}
+        if: success()
         with:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
           severity: info
-          username: pokedex@render
-          description: by ${{ github.event.pusher.name}}
-        
+          username: full-stack-pokedex@render
+          text: A new version of Pokedex deployed
+          description: to https://full-stack-open-pokedex-83d3.onrender.com/ by ${{ github.event.pusher.name }}
+      - name: Discord Notification - Failure
+        uses: rjstone/discord-webhook-notify@v2
+        if: failure()
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          severity: error
+          username: full-stack-pokedex@render
+          text: Build failed
+          description: "commit ${{ github.event.head_commit.url }} by ${{ github.event.pusher.name }} broke the build :("
 
   tag_release:
     needs: [simple_deployment_pipeline]
